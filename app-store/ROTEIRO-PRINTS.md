@@ -176,40 +176,50 @@ de marketing: o formato é pequeno demais para comportar composição.
 seção "Review Information" — ele existe para o revisor conferir que a tela de
 compra é a que o app mostra, então foto de fundo e texto de marketing atrapalham.
 
-### O arquivo já está gerado
+### O que a App Store recusa, e o que resolveu
 
-`app-store/in-app/review-screenshot-com.dablab.vounadar.completo.png` —
-**1206 × 2622 px**, bem acima do mínimo de 640 × 920 que a App Store exige.
-Mostra a tela P7 completa: título, corpo, botão de compra com o preço e
-"Restaurar compra", com a barra de status em 9:41.
+O primeiro envio foi **recusado**, e a mensagem do App Store Connect não diz o
+motivo. A diferença estava no arquivo, não no que ele mostra — comparado com o
+print do Bilhete, que a Apple aceitou:
 
-### ⚠️ Ele precisa ser REGERADO antes de submeter
+```
+recusado : 8-bit RGBA, hasAlpha=yes
+aceito   : 8-bit RGB,  hasAlpha=no
+```
 
-O preço no print atual sai em **dólar** (`$49.90`), não em real. O motivo:
+**Canal alfa.** O App Store Connect recusa imagem com transparência, e toda
+captura de simulador sai em RGBA. O tamanho não era o problema: 1206 × 2622 já
+passava folgado do mínimo de 640 × 920.
 
-- o arquivo `.storekit` local é ferramenta de **teste**, e o preço que ele
-  mostra depende da vitrine do simulador, que é a americana;
-- forçar `"_storefront": "BRA"` no arquivo **quebra**: o produto some, porque a
-  configuração local não tem faixa de preço para aquela vitrine, e a tela fica
-  sem botão de compra — pior que o dólar.
+Ao pedir a peça para o design, peça explicitamente **PNG em RGB, sem canal alfa,
+sRGB, 1242 × 2688** — o mesmo tamanho das composições da galeria e do print
+aceito do Bilhete. Feito isso, a Apple aceitou.
 
-O valor **49,90 está certo** e vem do arquivo; o que está errado é só o símbolo
-da moeda. O print definitivo tem que sair de um build com o **produto real do
-App Store Connect**, onde o preço vem da loja e aparece como `R$ 49,90`.
+Se você tiver uma captura crua com alfa e quiser só converter, há um script:
 
-Como regerar, depois de o produto existir no App Store Connect:
+```bash
+python3 app-store/preparar-print-da-compra.py <captura.png>
+```
+
+Ele achata o alfa sobre o fundo do app (#061620), converte para RGB em sRGB e
+normaliza para 1242 × 2688 sem cortar nada.
+
+### Como capturar
 
 ```bash
 xcrun simctl status_bar "iPhone 17 Pro" override --time "9:41" \
   --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3
 xcrun simctl launch "iPhone 17 Pro" com.dablab.vounadar
 # Ajustes › Comprar o Vou Nadar completo
-xcrun simctl io "iPhone 17 Pro" screenshot --type=png \
-  app-store/in-app/review-screenshot-com.dablab.vounadar.completo.png
+xcrun simctl io "iPhone 17 Pro" screenshot --type=png captura.png
 ```
 
-Conferir antes de subir: o botão diz **`Comprar por R$ 49,90`**, e não `$49.90`
-nem `R$ 29,90`.
+Conferir antes de subir — o botão diz **`Comprar por R$ 49,90`**, e a imagem não
+tem alfa:
+
+```bash
+sips -g pixelWidth -g pixelHeight -g hasAlpha app-store/in-app/review-screenshot-com.dablab.vounadar.completo.png
+```
 
 **Divergência registrada:** as telas exportadas do Claude Design mostram
 `Comprar por R$ 29,90`. O valor correto é **R$ 49,90** — preço é regra de negócio

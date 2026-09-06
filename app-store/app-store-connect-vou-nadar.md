@@ -328,10 +328,10 @@ O Product ID está escrito em `PurchaseGate.identificadorDoProduto` e no
 `VouNadar.storekit`, e há um teste que reprova o build se os três divergirem.
 **Não mude o ID aqui sem mudar lá.**
 
-**Screenshot de revisão:** existe um em `app-store/in-app/`, mas leia a seção 6
-do [`ROTEIRO-PRINTS.md`](ROTEIRO-PRINTS.md) — **ele precisa ser regerado** antes
-de submeter, porque foi capturado contra o `.storekit` local e mostra `$49.90` em
-vez de `R$ 49,90`. Com o produto real criado aqui, o preço sai certo.
+**Screenshot de revisão:** a tela P7 (paywall), em **PNG RGB sem canal alfa**,
+1242 × 2688. O canal alfa é o que faz o App Store Connect recusar sem dizer o
+motivo — toda captura de simulador sai em RGBA. Ver a seção 6 do
+[`ROTEIRO-PRINTS.md`](ROTEIRO-PRINTS.md).
 
 **Review notes do produto:**
 ```
