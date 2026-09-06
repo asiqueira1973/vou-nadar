@@ -1,0 +1,29 @@
+{
+  "identifier": "VOUNADAR-LOCAL",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "49.90",
+      "familyShareable": false,
+      "internalID": "VN-COMPLETO",
+      "localizations": [
+        {
+          "description": "Compra única. Sem assinatura, sem mensalidade, sem anúncio. Vale para sempre, em todos os seus aparelhos.",
+          "displayName": "Vou Nadar completo",
+          "locale": "pt_BR"
+        }
+      ],
+      "productID": "com.dablab.vounadar.completo",
+      "referenceName": "Vou Nadar completo",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

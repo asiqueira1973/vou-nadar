@@ -1,0 +1,230 @@
+// ============================================================================
+// Vou Nadar — Modelo de dados
+// Gerado a partir da seção 7 do spec-vou-nadar.md (v1.0, 06/09/2026)
+//
+// Cole em https://dbdiagram.io para ver o diagrama.
+//
+// NOTA: a persistência é SwiftData, não SQL. Este arquivo documenta o modelo
+// lógico. Os nomes aqui são os nomes PERSISTIDOS — português em snake_case,
+// preservados no código por @Attribute(originalName:) — conforme a seção 7.0.
+// As propriedades Swift usam a mesma palavra em lowerCamelCase.
+//
+// O CATÁLOGO (exercicio_catalogo, tipo_equipamento) NÃO está aqui: ele vive
+// como JSON no bundle, é read-only e nunca entra no SwiftData (seção 7.13).
+// ============================================================================
+
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum origem_treino {
+  gerado_iphone
+  gerado_watch
+}
+
+enum ritmo_descanso {
+  curto   // multiplicador 0,75x sobre a tabela de descanso (regra 11.5)
+  normal  // 1,0x
+  longo   // 1,5x
+}
+
+enum tipo_secao {
+  aquecimento
+  progressao
+  principal
+  soltura
+}
+
+enum modo_exercicio {
+  nado
+  bracada
+  pernada
+  educativo
+}
+
+enum intensidade {
+  aquecimento
+  soltura
+  moderado
+  aerobico
+  resistencia
+  variavel
+}
+
+enum motivo_encerramento {
+  concluido
+  encerrado_antes
+  descartado_curto
+  falhou
+}
+
+
+// ---------------------------------------------------------------------------
+// treino
+// Exclusão: SOFT DELETE por arquivado_em (seção 7.10) — há sessões apontando
+// para ele, e apagar apagaria histórico de volume.
+// ---------------------------------------------------------------------------
+Table treino {
+  id uuid [pk, note: '@Attribute(.unique)']
+  titulo texto [note: 'NULO enquanto não favoritado; exibido como "Treino de {data curta}". Ao favoritar vira obrigatório, 1 a 60 caracteres, não só espaços (regra 11.14)']
+  origem origem_treino [not null, default: 'gerado_iphone']
+  distancia_total_m integer [not null, note: 'soma de metros_totais de todas as séries']
+  distancia_min_solicitada_m integer [not null, note: 'faixa pedida na geração, guardada para o histórico fazer sentido depois']
+  distancia_max_solicitada_m integer [not null]
+  tamanho_raia_m integer [not null, note: 'CONGELADO na geração. O treino foi montado para uma piscina específica (regra 11.3); trocar de piscina não reescreve treino salvo']
+  ritmo_descanso_usado ritmo_descanso [not null, default: 'normal', note: 'congelado na geração junto com os descansos das séries (princípio 0.6)']
+  com_educativos boolean [not null, default: false]
+  com_pernada boolean [not null, default: false]
+  favorito boolean [not null, default: false, note: 'define o que vai para o relógio (regra 11.12)']
+  vezes_executado integer [not null, default: 0, note: 'DENORMALIZADO. Atualizado na mesma transação de toda inserção e remoção de sessao_natacao (regra 11.13)']
+  ultima_execucao_em timestamp [note: 'NULO enquanto o treino nunca foi executado']
+  criado_em timestamp [not null, default: `now()`]
+  atualizado_em timestamp [not null, default: `now()`, note: 'chave de ordenação da lista de Favoritos']
+  arquivado_em timestamp [note: 'SOFT DELETE. NULO = ativo. Preenchido, some das listas mas as sessões continuam no Histórico (regra 11.15)']
+
+  Note: 'Todo treino tem exatamente quatro seções, inclusive vazias (regra 11.1)'
+}
+
+
+// ---------------------------------------------------------------------------
+// secao_treino
+// Exclusão: CASCADE a partir do treino — seção não tem significado fora dele.
+// Invariantes que o repositório preserva (SwiftData não as declara, seção 7.11):
+//   ordem de 1 a 4, única por treino
+//   um único registro por tipo_secao dentro do mesmo treino
+// ---------------------------------------------------------------------------
+Table secao_treino {
+  id uuid [pk]
+  treino_id uuid [not null]
+  tipo_secao tipo_secao [not null]
+  ordem integer [not null, note: '1 a 4, na ordem de exibição']
+  distancia_alvo_m integer [not null, note: 'meta do algoritmo na geração; guardada para depuração']
+  descanso_pos_secao_seg integer [not null, note: 'descanso entre esta seção e a próxima (regra 11.6). ZERO na última seção']
+}
+
+
+// ---------------------------------------------------------------------------
+// serie_treino
+// Guarda SNAPSHOT dos dados do exercício, não referência (princípio 0.6):
+// um favorito guardado hoje abre igual daqui a dois anos. Por isso
+// exercicio_id NÃO é chave estrangeira — pode apontar para exercício removido
+// numa release futura sem quebrar nada.
+// Exclusão: CASCADE a partir da seção.
+// ---------------------------------------------------------------------------
+Table serie_treino {
+  id uuid [pk]
+  secao_treino_id uuid [not null]
+  exercicio_id texto [not null, note: 'referência LÓGICA ao catálogo JSON, sem FK (princípio 0.6)']
+  repeticoes integer [not null, note: 'snapshot']
+  distancia_m integer [not null, note: 'DISTÂNCIA REAL por repetição, já adaptada à raia (regra 11.3): voltas_por_repeticao × tamanho_raia_m. É o que a interface exibe. Sempre múltiplo exato do tamanho da raia']
+  distancia_catalogo_m integer [not null, note: 'snapshot do que o catálogo pedia, antes da adaptação. Só para rastreabilidade; a interface nunca mostra']
+  metros_totais integer [not null, note: 'repeticoes × distancia_m — sobre a distância REAL, nunca a do catálogo']
+  descanso_seg integer [not null, note: 'SNAPSHOT do descanso ENTRE as repetições, calculado pela regra 11.5 na geração. É o número que vira a contagem regressiva no relógio']
+  descanso_pos_serie_seg integer [not null, note: 'descanso entre esta série e a próxima da mesma seção (regra 11.6). ZERO na última série da seção — ali vale o descanso_pos_secao_seg']
+  voltas_por_repeticao integer [not null, note: 'max(1, arredonda(distancia_catalogo_m / treino.tamanho_raia_m)), calculado na geração e CONGELADO. É o contador que o relógio usa para saber que a repetição acabou (regras 11.3 e 11.7)']
+  nome_snapshot texto [not null]
+  descricao_snapshot texto [not null]
+  equipamento_exigido texto [not null, default: 'nenhum', note: 'snapshot; desenha o ícone na linha']
+  modo modo_exercicio [not null, default: 'nado', note: 'snapshot; desenha o selo braçada/pernada/técnica']
+  intensidade intensidade [not null, note: 'snapshot; usado pela cor semântica da linha']
+  ordem integer [not null, note: '>= 1, contígua dentro da seção']
+}
+
+
+// ---------------------------------------------------------------------------
+// preferencias — SINGLETON, exatamente uma linha
+// Unicidade garantida por código no acesso (busca-o-primeiro-ou-cria), NÃO por
+// constraint: SwiftData não expressa "no máximo uma linha" (seção 7.11).
+// Nunca deletada, exceto por "Apagar todos os dados".
+// ---------------------------------------------------------------------------
+Table preferencias {
+  id uuid [pk]
+  distancia_min_m integer [not null, default: 1500, note: 'piso da faixa pedida na Home']
+  distancia_max_m integer [not null, default: 2500, note: 'teto. PODE ser igual ao piso — faixa fechada é caso de uso legítimo. Validar min <= max no repositório']
+  incluir_educativos boolean [not null, default: false]
+  incluir_pernada boolean [not null, default: false]
+  tamanho_raia_m integer [not null, default: 25, note: 'comprimento da raia. Validar 10...50 — piscina de condomínio costuma ter 12, 15, 16, 18 ou 20 m. Alimenta o lapLength do HealthKit e a adaptação da regra 11.3']
+  raia_confirmada boolean [not null, default: false, note: 'falso até o usuário confirmar uma vez. Enquanto falso NÃO é possível gerar treino (regra 11.4)']
+  ritmo_descanso ritmo_descanso [not null, default: 'normal', note: 'multiplicador global da tabela de descanso (regra 11.5)']
+  versao_catalogo_visto integer [not null, default: 0, note: 'default de SCHEMA. O seed grava a versão embarcada, para instalação nova não ver banner de novidade no primeiro dia']
+  criado_em timestamp [not null, default: `now()`]
+  atualizado_em timestamp [not null, default: `now()`, note: 'decide quem vence na sincronização (regra 11.12)']
+}
+
+
+// ---------------------------------------------------------------------------
+// equipamento_selecionado
+// Zero linhas é estado válido e comum: nadador sem equipamento nenhum. Nesse
+// caso a geração usa só exercícios com equipamento_exigido = nenhum.
+// Exclusão: hard delete — é estado de configuração, não histórico.
+// ---------------------------------------------------------------------------
+Table equipamento_selecionado {
+  id uuid [pk]
+  equipamento_id texto [not null, unique, note: '@Attribute(.unique). Referência LÓGICA ao tipos_equipamento.json, sem FK. Valores: pull_buoy, palmares, nadadeiras, prancha']
+  selecionado_em timestamp [not null, default: `now()`]
+}
+
+
+// ---------------------------------------------------------------------------
+// sessao_natacao — a execução real
+// Nasce no relógio. É o registro do que aconteceu na água, distinto do treino
+// planejado.
+// Exclusão: HARD DELETE, e só pelo iPhone. O HKWorkout correspondente NÃO é
+// apagado junto — é dado de saúde do usuário, sai pelo app Saúde (seção 7.10).
+// Índice em iniciada_em (o Histórico ordena por ele).
+// ---------------------------------------------------------------------------
+Table sessao_natacao {
+  id uuid [pk, note: '@Attribute(.unique)']
+  treino_id uuid [note: 'NULO em sessão livre, sem treino associado']
+  titulo_snapshot texto [note: 'NULO em sessão livre. Cópia no momento da execução, para o histórico sobreviver ao arquivamento do treino']
+  iniciada_em timestamp [not null, note: 'INDEXADO']
+  encerrada_em timestamp [note: 'NULO enquanto em andamento ou pausada']
+  distancia_planejada_m integer [not null, default: 0, note: 'zero em sessão livre']
+  distancia_real_m integer [not null, default: 0, note: 'medida pelo HealthKit. É o que vai para o HKWorkout, NUNCA o planejado (regra 11.10)']
+  series_concluidas integer [not null, default: 0]
+  repeticoes_concluidas integer [not null, default: 0, note: 'granularidade fina, para o resumo dizer "parou no meio do 3º de 4x100"']
+  healthkit_workout_uuid uuid [note: 'NULO até gravar com sucesso, e permanentemente NULO se a gravação falhar (motivo_encerramento = falhou)']
+  tamanho_raia_m integer [not null, note: 'congelado no início da sessão; trocar de piscina depois não altera histórico']
+  motivo_encerramento motivo_encerramento [note: 'NULO enquanto a sessão está em andamento']
+
+  Note: 'Sessões com distancia_real_m < 25 são descartadas sem gravar HKWorkout (regra 11.11)'
+}
+
+
+// ---------------------------------------------------------------------------
+// Relacionamentos
+// ---------------------------------------------------------------------------
+
+// Um treino tem exatamente quatro seções; uma seção pertence a um treino.
+Ref: treino.id < secao_treino.treino_id
+
+// Uma seção tem de zero a N séries, em ordem contígua a partir de 1.
+Ref: secao_treino.id < serie_treino.secao_treino_id
+
+// Um treino pode ser executado muitas vezes; uma sessão referencia no máximo
+// um treino (nula em sessão livre). O treino usa soft delete, então a sessão
+// nunca fica órfã — e ainda assim guarda titulo_snapshot por segurança.
+Ref: treino.id < sessao_natacao.treino_id
+
+
+// ---------------------------------------------------------------------------
+// Fora deste diagrama
+// ---------------------------------------------------------------------------
+// - exercicio_catalogo (226 registros) e tipo_equipamento (5 registros) vivem
+//   como JSON no bundle assinado, são read-only e NUNCA entram no SwiftData
+//   (seções 7.2, 7.3 e 7.13). São copiados uma vez do Swim Builder e passam a
+//   ter vida própria — sem package compartilhado e sem sincronização (4.4).
+// - O catálogo NÃO tem campo de descanso. O descanso é calculado pela regra
+//   11.5 no momento da geração e gravado como snapshot em
+//   serie_treino.descanso_seg.
+// - O catálogo também não conhece o tamanho da piscina. As distâncias dele são
+//   ADAPTADAS à raia na geração (regra 11.3): o 4x100 do catálogo vira 4x96 m
+//   numa piscina de 16 m, porque são 6 voltas. Exercícios cuja adaptação
+//   passaria de 25% de desvio saem do sorteio naquela piscina.
+// - HKWorkout vive no HealthKit, fora do SwiftData. A ligação é o campo
+//   sessao_natacao.healthkit_workout_uuid.
+// - Não há tabela de usuário: app single-user, sem conta e sem login
+//   (seções 5 e 6).
+// - O schema nasce versionado como VouNadarSchemaV1 com SchemaMigrationPlan
+//   declarado desde o v1, mesmo sem migração nenhuma ainda (seção 7.12).

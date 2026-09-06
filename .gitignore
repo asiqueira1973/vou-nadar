@@ -1,0 +1,21 @@
+# O .xcodeproj é GERADO por `xcodegen generate` a partir do project.yml.
+# Nunca é versionado e nunca é editado à mão (spec 4.3 e critério 8.1.2).
+*.xcodeproj/
+*.xcworkspace/
+
+# Não existe dependência SPM de terceiro neste projeto (critério 8.1.3).
+# Este arquivo não deve nascer; se nascer, alguém violou o princípio 0.4.
+Package.resolved
+
+# Derivados de build
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.xcresult
+
+# Sistema e editor
+.DS_Store
+xcuserdata/
+*.xcuserstate
+.swiftpm/

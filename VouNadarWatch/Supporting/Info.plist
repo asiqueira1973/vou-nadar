@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>pt-BR</string>
+	<key>CFBundleDisplayName</key>
+	<string>Vou Nadar</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<!-- Esquema de URL da complication (critério 8.12): tocar no mostrador
+	     abre o app na tela Início. Sem esta declaração o sistema não entrega a
+	     URL, e o toque abriria o app onde ele parou. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.dablab.vounadar.watchkitapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>vounadar</string>
+			</array>
+		</dict>
+	</array>
+	<key>WKApplication</key>
+	<true/>
+	<key>WKCompanionAppBundleIdentifier</key>
+	<string>com.dablab.vounadar</string>
+	<!-- Roda a sessão de treino em segundo plano enquanto o pulso está na
+	     água (épico 8.8). -->
+	<key>WKBackgroundModes</key>
+	<array>
+		<string>workout-processing</string>
+	</array>
+	<!-- Copy 15.10, literal. O relógio LÊ e ESCREVE (spec 13.4). -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>O Vou Nadar usa a distância nadada para acompanhar o treino e contar o descanso.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>O Vou Nadar salva seu treino de natação no app Saúde.</string>
+</dict>
+</plist>

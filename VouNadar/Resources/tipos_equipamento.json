@@ -1,0 +1,34 @@
+{
+  "equipamentos": [
+    {
+      "equipamento_id": "nenhum",
+      "nome": "Nenhum",
+      "icone_sf": "figure.pool.swim",
+      "ordem": 0
+    },
+    {
+      "equipamento_id": "pull_buoy",
+      "nome": "Pull buoy",
+      "icone_sf": "capsule.portrait",
+      "ordem": 1
+    },
+    {
+      "equipamento_id": "palmares",
+      "nome": "Palmares",
+      "icone_sf": "hand.raised",
+      "ordem": 2
+    },
+    {
+      "equipamento_id": "nadadeiras",
+      "nome": "Nadadeiras",
+      "icone_sf": "shoeprints.fill",
+      "ordem": 3
+    },
+    {
+      "equipamento_id": "prancha",
+      "nome": "Prancha",
+      "icone_sf": "rectangle.portrait",
+      "ordem": 4
+    }
+  ]
+}
