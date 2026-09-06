@@ -687,6 +687,26 @@ header do `StoreKitTest` **da Apple** usa `SKPaymentTransactionState`, deprecado
 no iOS 18. A exceção é estreita, está declarada no `project.yml` e não tolera
 nenhum warning nosso.
 
+### 6.13 O iPhone declara string de escrita no HealthKit sem nunca escrever
+
+**Spec 4.1:** o iPhone **só lê** do HealthKit; quem escreve é o relógio. Isso
+continua verdade no código.
+
+**O que o validador da App Store exige:** as **duas** strings de propósito —
+`NSHealthShareUsageDescription` e `NSHealthUpdateUsageDescription` — em todo
+bundle que carregue o entitlement `com.apple.developer.healthkit`,
+independentemente do que o código faz. O upload da 1.0.0 foi recusado com
+*"Missing purpose string in Info.plist"* apontando para `VouNadar.app`.
+
+**O que foi feito:** as duas strings entraram no `Info.plist` do iPhone e no da
+complication, com a copy 15.10 literal. Comentário ao lado de cada uma explica
+por que estão ali.
+
+**Por que isso não mente para o usuário:** a folha de autorização do sistema só
+mostra a string do que é efetivamente pedido. O iPhone chama
+`requestAuthorization(toShare: [], read: ...)` e a complication não pede nada —
+então o texto de escrita nunca aparece em nenhuma das duas telas.
+
 ### 6.12 O que não foi implementado, por decisão
 
 Do anti-escopo e do roadmap (spec 28), nada foi implementado — nem "só a

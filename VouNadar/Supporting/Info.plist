@@ -32,6 +32,16 @@
 	<!-- Copy 15.10, literal. O iPhone SÓ LÊ do HealthKit (spec 4.1). -->
 	<key>NSHealthShareUsageDescription</key>
 	<string>O Vou Nadar usa a distância nadada para acompanhar o treino e contar o descanso.</string>
+	<!-- O iPhone não escreve no HealthKit (spec 4.1) — quem escreve é o relógio.
+	     Esta chave existe porque o validador da App Store exige as duas strings
+	     em qualquer bundle que carregue o entitlement do HealthKit, mesmo que o
+	     código nunca chame a API de escrita. Sem ela o upload é recusado com
+	     "Missing purpose string in Info.plist".
+	     O texto nunca aparece para o usuário: o iPhone pede autorização com
+	     `requestAuthorization(toShare: [], ...)`, e a folha do sistema só mostra
+	     a string do que é pedido. Copy 15.10, literal. -->
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>O Vou Nadar salva seu treino de natação no app Saúde.</string>
 	<!-- O app não implementa criptografia. Declarar aqui evita a pergunta de
 	     conformidade de exportação a cada upload de build. -->
 	<key>ITSAppUsesNonExemptEncryption</key>

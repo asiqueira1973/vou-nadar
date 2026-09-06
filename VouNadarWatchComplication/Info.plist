@@ -20,6 +20,15 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<!-- A complication LÊ o volume da semana do HealthKit (épico 8.12) e nunca
+	     escreve. As duas strings estão aqui pelo mesmo motivo do Info.plist do
+	     iPhone: o validador da App Store as exige em todo bundle com o
+	     entitlement do HealthKit, independentemente do que o código faz.
+	     Copy 15.10, literal. -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>O Vou Nadar usa a distância nadada para acompanhar o treino e contar o descanso.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>O Vou Nadar salva seu treino de natação no app Saúde.</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
