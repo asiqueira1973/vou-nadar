@@ -249,5 +249,7 @@ evite legenda que as apresente como cliente real ou resultado real de usuário.
 5. Montar a galeria do relógio com as cinco capturas diretas.
 6. Capturar o print da compra, cru, com R$ 49,90 na tela.
 7. Conferir imagem por imagem que nenhuma mostra R$ 29,90.
-8. Confirmar no App Store Connect se ele quer 6,5", 6,9" ou os dois, e
-   renderizar as composições no tamanho pedido.
+8. Renderizar as composições em **1242 × 2688 (6,5")** — o mesmo padrão do
+   Bilhete e do Swim Builder. A App Store deriva os tamanhos menores a partir
+   dessas. Se as peças vierem em 6,9" (1290 × 2796), elas também são aceitas: a
+   proporção é a mesma (19,5:9), então redimensionar resolve sem recompor.

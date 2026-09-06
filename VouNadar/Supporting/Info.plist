@@ -32,5 +32,9 @@
 	<!-- Copy 15.10, literal. O iPhone SÓ LÊ do HealthKit (spec 4.1). -->
 	<key>NSHealthShareUsageDescription</key>
 	<string>O Vou Nadar usa a distância nadada para acompanhar o treino e contar o descanso.</string>
+	<!-- O app não implementa criptografia. Declarar aqui evita a pergunta de
+	     conformidade de exportação a cada upload de build. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
