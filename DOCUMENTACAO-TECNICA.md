@@ -707,6 +707,44 @@ mostra a string do que é efetivamente pedido. O iPhone chama
 `requestAuthorization(toShare: [], read: ...)` e a complication não pede nada —
 então o texto de escrita nunca aparece em nenhuma das duas telas.
 
+### 6.14 A descrição do exercício cita a metragem do catálogo, e não é ajustada
+
+**O que acontece:** `descricaoSnapshot` vem do catálogo e cita a distância
+original. Em raia fora do padrão ela contradiz o número ao lado — a série sai
+como `3×144 m` e a descrição diz *"Três repetições de 150m de braçada com pull
+buoy"*. **192 das 226 descrições citam metragem** (84%), então numa piscina de
+18 m isso acontece o tempo todo.
+
+É a mesma classe do conflito que a divergência 6.2 resolveu para os **nomes**.
+Lá foi corrigido porque a contradição ficava dentro da **mesma linha**
+(`1×304 1x300 Aquecimento Leve`, dois números discordando lado a lado). Aqui ela
+está entre a linha e o texto de apoio, que é mais tolerável.
+
+**Decisão do Alexandre em 06/09/2026, testando numa piscina real de 18 m:
+aceitar, sem mexer.** Quem nada em piscina fora do padrão entende bem. A
+descrição explica a **intenção** do exercício, não a prescrição; o cabeçalho da
+tela já diz que as distâncias foram ajustadas para fechar voltas inteiras; e o
+número que vale é o da direita.
+
+### 6.15 Não existe "marcar como executado" no iPhone
+
+**O que acontece:** só o `WorkoutSessionController`, que é do relógio, cria
+`SessaoNatacao`. O iPhone lê o Histórico e nunca escreve sessão. Nenhuma tela de
+P1 a P7 tem a ação, e o spec não a prevê.
+
+**Consequência, deliberada:** sem relógio, `vezes_executado` fica em zero, o
+Histórico e o volume da semana ficam vazios, e **o paywall nunca aparece** — a
+contagem de execuções sai do HealthKit, e sem relógio não há execução para
+contar. O iPhone sozinho gera, copia como texto e favorita; o resto é folheto.
+
+**Decisão do Alexandre em 06/09/2026: manter assim.** Executar só pelo relógio é
+o que garante **acurácia no app Saúde** — distância e duração vêm de medição, não
+de alguém digitando o que acha que nadou. Um botão "marquei como feito" no
+iPhone poria dado estimado no mesmo lugar onde hoje só entra dado medido, e é
+esse lugar que alimenta o Histórico, o volume da semana e a complication.
+
+Também é coerente com a compra: o que se vende é a execução guiada.
+
 ### 6.12 O que não foi implementado, por decisão
 
 Do anti-escopo e do roadmap (spec 28), nada foi implementado — nem "só a
