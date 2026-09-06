@@ -247,7 +247,12 @@ targets:
       - path: VouNadarWatch/Health/WeeklyVolumeReader.swift
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID).watchkitapp.complication
+        # `.widgets`, e não `.complication`: o identificador terminado em
+        # `.complication` ficou indisponível no Developer Portal — não aparece na
+        # lista de App IDs e mesmo assim é recusado no registro. Trocado antes da
+        # primeira publicação, quando ainda não custa nada. Mesma convenção do
+        # Bilhete (`com.dablab.bilhete.widgets`).
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID).watchkitapp.widgets
         PRODUCT_NAME: VouNadarWatchComplication
         TARGETED_DEVICE_FAMILY: "4"
         INFOPLIST_FILE: VouNadarWatchComplication/Info.plist

@@ -14,7 +14,7 @@ Aqui é tudo o que é texto e formulário.
 |---|---|
 | Bundle ID do app | `com.dablab.vounadar` |
 | Bundle ID do app do Apple Watch | `com.dablab.vounadar.watchkitapp` |
-| Bundle ID da complication | `com.dablab.vounadar.watchkitapp.complication` |
+| Bundle ID da complication | `com.dablab.vounadar.watchkitapp.widgets` |
 | Produto de compra no app | `com.dablab.vounadar.completo` |
 | Team ID | `XGZW6Y6K25` |
 | Versão / build | 1.0.0 (1) |
@@ -41,7 +41,7 @@ quase tudo. Aqui você confere, não cria.
 1. `com.dablab.vounadar` deve existir, do tipo App (explícito).
    Capability marcada: **HealthKit**. Só ela.
 2. `com.dablab.vounadar.watchkitapp` deve existir, também com **HealthKit**.
-3. `com.dablab.vounadar.watchkitapp.complication` deve existir, também com
+3. `com.dablab.vounadar.watchkitapp.widgets` deve existir, também com
    **HealthKit** — a complication lê o volume da semana direto do HealthKit,
    porque é outro processo e não compartilha o banco do app.
 
