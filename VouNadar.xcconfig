@@ -8,8 +8,8 @@
 // Connect. O watchOS e a complication derivam deste prefixo.
 BUNDLE_ID = com.dablab.vounadar
 
-MARKETING_VERSION = 1.0.0
-CURRENT_PROJECT_VERSION = 1
+MARKETING_VERSION = 1.1.0
+CURRENT_PROJECT_VERSION = 2
 
 // Conta Apple Developer da Dab Lab. Necessária para instalar em aparelho real,
 // que é onde o teste de piscina da seção 22 acontece.

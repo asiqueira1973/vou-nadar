@@ -17,7 +17,7 @@ Aqui é tudo o que é texto e formulário.
 | Bundle ID da complication | `com.dablab.vounadar.watchkitapp.widgets` |
 | Produto de compra no app | `com.dablab.vounadar.completo` |
 | Team ID | `XGZW6Y6K25` |
-| Versão / build | 1.0.0 (1) |
+| Versão / build | 1.1.0 (2) |
 | Deployment target | iOS 18.0 (iPhone apenas, retrato) · watchOS 11.0 |
 
 > **Cuidado com o `.completo`:** ele é o **identificador do produto de compra**,
@@ -114,7 +114,7 @@ indexa com mais peso.
 
 ---
 
-## 2. Version Information (versão 1.0.0)
+## 2. Version Information (versão 1.1.0)
 
 ### Texto promocional (159/170)
 
@@ -183,8 +183,16 @@ repeti-las desperdiçaria bytes.
 ### Novidades desta versão
 
 ```
-Primeira versão do Vou Nadar.
+Agora, em piscina menor que 25 metros, cada série mostra quantas travessias tem a repetição.
+
+Numa raia de 18 m, um 4×54 aparece como "3 piscinas" e um 2×252 como "7 chegadas". Chegada é ida e volta; quando as travessias não fecham em pares, a conta sai em piscinas.
+
+É o número que ninguém quer calcular de cabeça na borda.
 ```
+
+Em raia de 25 ou 50 m a linha não aparece, e por isso a primeira frase diz o
+limite: sem ela, quem nada em piscina padrão procura um recurso que não existe
+para ele e abre chamado no suporte.
 
 ### Capturas de tela
 
@@ -447,8 +455,9 @@ Resultado esperado: **4+**.
 
 ## 10. Build e envio
 
-1. Confirme `MARKETING_VERSION = 1.0.0` e `CURRENT_PROJECT_VERSION = 1` no
-   `VouNadar.xcconfig` (já estão).
+1. Confirme `MARKETING_VERSION = 1.1.0` e `CURRENT_PROJECT_VERSION = 2` no
+   `VouNadar.xcconfig` (já estão). **O build tem que ser maior que o da versão
+   já publicada**, ou o upload é recusado.
 2. `xcodegen generate`, para o projeto refletir o `project.yml`.
 3. No Xcode: destino **Any iOS Device (arm64)** → Product → Archive. O app do
    relógio e a complication vão embarcados; **não** existe archive separado.
