@@ -102,6 +102,31 @@ enum Copy {
     /// Unidade ao lado do numeral herói, em `.title3`.
     static let unidadeMetros = LocalizedStringResource("m")
 
+    /// A contagem de travessias como a linha sob a metragem a mostra:
+    /// `"1 chegada"`, `"4 chegadas"`, `"3 piscinas"`.
+    ///
+    /// Recebe: a contagem já decidida por `LapDisplay`.
+    /// Devolve: o texto pronto, com singular e plural corretos — `2×54` em raia
+    /// de 18 m tem três travessias e vira `"3 piscinas"`, e um `50 m` em raia de
+    /// 25 m tem duas e vira `"1 chegada"`, que é o caso mais comum do catálogo.
+    ///
+    /// Singular e plural resolvidos aqui, e não por regra de plural do String
+    /// Catalog, porque o app é só pt-BR (o inglês está fora do v1) e são quatro
+    /// formas fixas — infraestrutura de pluralização aqui seria cerimônia sem
+    /// uso.
+    static func travessias(_ contagem: LapDisplay.Contagem) -> LocalizedStringResource {
+        switch contagem {
+        case .chegadas(let quantas):
+            quantas == 1
+                ? LocalizedStringResource("1 chegada")
+                : LocalizedStringResource("\(quantas) chegadas")
+        case .piscinas(let quantas):
+            quantas == 1
+                ? LocalizedStringResource("1 piscina")
+                : LocalizedStringResource("\(quantas) piscinas")
+        }
+    }
+
     /// Rótulo sob o herói.
     static let heroiTotal = LocalizedStringResource("Total")
 

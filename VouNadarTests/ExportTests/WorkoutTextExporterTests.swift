@@ -29,6 +29,9 @@ struct WorkoutTextExporterTests {
             modo: modo,
             intensidade: .aerobico,
             descansoSeg: descanso,
+            // O texto copiado não mostra travessias (decisão de 15/09/2026:
+            // a contagem é só da tela P2), então qualquer valor válido serve.
+            voltasPorRepeticao: max(1, distanciaM / 25),
             simboloDoEquipamento: nil)
     }
 

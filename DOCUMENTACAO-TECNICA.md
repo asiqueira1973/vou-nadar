@@ -4,8 +4,9 @@ Entregável da seção 19 do `spec-vou-nadar.md`. Descreve o sistema **como fico
 não como foi planejado. Onde o implementado difere do spec, isso está na
 **seção 6 — Divergências**, e não escondido no meio do texto.
 
-Escrito contra o código em 06/09/2026: 67 arquivos de código-fonte, 206 testes em
-20 suítes, iOS e watchOS compilando em Release sem nenhum warning.
+Escrito contra o código em 06/09/2026 e atualizado em 15/09/2026: 68 arquivos de
+código-fonte, 214 testes em 21 suítes, iOS e watchOS compilando em Release sem
+nenhum warning.
 
 **Sumário**
 
@@ -285,7 +286,27 @@ hápticos (entrada em descanso, contagem final, saída do descanso, conclusão).
 `LapCounter` conta voltas a partir da **distância acumulada** que o HealthKit
 reporta, e não de eventos de virada, e nunca decrementa quando a leitura regride.
 
-### 3.6 Volume semanal — `Semana` e `VolumeSemanal` (regra 11.16)
+### 3.6 Contagem de travessias — `LapDisplay`
+
+`VouNadar/Domain/LapDisplay.swift`
+
+Roda ao **desenhar** a tela P2, uma vez por série. Traduz
+`voltas_por_repeticao` para o vocabulário do nadador:
+
+- `contagem(voltasPorRepeticao:tamanhoRaiaM:)` — devolve `.chegadas(n)` quando as
+  travessias fecham em pares (chegada é ida e volta) e `.piscinas(n)` quando não
+  fecham; `nil` em raia de 25 m ou maior, onde a conta é óbvia.
+- `raiaMaximaM = 25` — o limite, exclusivo.
+
+**Não viola o princípio 0.6**, embora calcule na leitura: `voltas_por_repeticao`
+continua sendo o snapshot gravado na geração, e a função só o divide por dois. Um
+favorito mostra a mesma contagem para sempre.
+
+Cuidado com a palavra: o código chama de **volta** uma travessia, que na boca do
+nadador é uma **piscina**; **chegada** são duas voltas. Este arquivo é a única
+fronteira onde os dois vocabulários se encontram.
+
+### 3.7 Volume semanal — `Semana` e `VolumeSemanal` (regra 11.16)
 
 `VouNadar/Domain/Semana.swift`, `VouNadar/Domain/History/VolumeSemanal.swift`
 
@@ -296,7 +317,7 @@ A semana começa na **segunda-feira**, no fuso do aparelho.
 `mediaSemanal(...)` divide **incluindo as semanas vazias** — semana sem nadar é
 informação, não ausência de dado.
 
-### 3.7 Compra — `PurchaseGate` e `PurchaseService` (regra 11.17)
+### 3.8 Compra — `PurchaseGate` e `PurchaseService` (regra 11.17)
 
 `VouNadar/Domain/Purchase/PurchaseGate.swift`,
 `VouNadar/Data/Purchase/PurchaseService.swift`
@@ -314,7 +335,7 @@ piscina, é pior que liberar a quem não pagou.
 Store: `Product.products(for:)`, `Transaction.currentEntitlements`,
 `Transaction.updates` e `AppStore.sync()` para restaurar.
 
-### 3.8 Sincronização iPhone → relógio (contrato 13.3)
+### 3.9 Sincronização iPhone → relógio (contrato 13.3)
 
 `VouNadar/Domain/Sync/`, `VouNadar/Connectivity/PhoneSyncService.swift`,
 `VouNadarWatch/Connectivity/WatchSyncService.swift`
@@ -340,7 +361,7 @@ O fluxo é de mão única. O relógio nunca escreve no iPhone — há um teste,
 `atualizado_em` que chegou com o local e só sobrescreve se o de fora for mais
 recente.
 
-### 3.9 Gravação no HealthKit — `WorkoutSessionController` (épico 8.9, regras 11.10 e 11.11)
+### 3.10 Gravação no HealthKit — `WorkoutSessionController` (épico 8.9, regras 11.10 e 11.11)
 
 `VouNadarWatch/Health/WorkoutSessionController.swift`
 
@@ -354,7 +375,7 @@ distância que chega ao vivo.
 Saúde. Falha na gravação vira `motivoEncerramento = .falhou` com aviso na tela;
 **nunca falha silenciosa**.
 
-### 3.10 Leitura do histórico — `HealthHistoryReader` e `WeeklyVolumeReader`
+### 3.11 Leitura do histórico — `HealthHistoryReader` e `WeeklyVolumeReader`
 
 `VouNadar/Data/Health/HealthHistoryReader.swift` (iPhone, só lê),
 `VouNadarWatch/Health/WeeklyVolumeReader.swift` (relógio e complication).
@@ -365,7 +386,7 @@ do app para o portão da compra. `WeeklyVolumeReader` devolve **um número** e
 distingue `nil` ("não sei") de `0` ("respondeu, e você não nadou") — é o que
 permite a complication mostrar um traço em vez de mentir.
 
-### 3.11 Repositórios
+### 3.12 Repositórios
 
 `PreferencesRepository` e `WorkoutRepository` são compartilhados pelos dois apps.
 O ponto mais delicado é `registrarSessao(_:)`: ele grava a sessão e atualiza
@@ -382,7 +403,7 @@ termos.
 | Tela | Lê | Escreve | Rotinas que atravessa |
 |---|---|---|---|
 | **P1 Home** (`HomeView`) | `Preferencias`, `EquipamentoSelecionado`, catálogo | `Preferencias`, `EquipamentoSelecionado`, `Treino` (+ seções e séries) | `PreferencesRepository`, `AdaptedCatalog`, `RepertoireGuard`, `WorkoutGenerator`, `LaneAdapter`, `RestCalculator`, `WorkoutRepository.salvar` |
-| **P2 Detalhe** (`WorkoutDetailView`) | `Treino` | `Treino` (favorito, título) | `WorkoutPresentation`, `ExerciseName`, `WorkoutTextExporter`, `WorkoutRepository.favoritar` |
+| **P2 Detalhe** (`WorkoutDetailView`) | `Treino` | `Treino` (favorito, título) | `WorkoutPresentation`, `ExerciseName`, `LapDisplay`, `WorkoutTextExporter`, `WorkoutRepository.favoritar` |
 | **P3 Favoritos** (`FavoritesView`) | `Treino` (favoritos) | `Treino` (renomear, arquivar) | `WorkoutRepository.favoritos` / `.renomear` / `.arquivar` |
 | **P4 Histórico** (`HistoryView`) | HealthKit, `SessaoNatacao` | — | `HealthHistoryReader.sessoes`, `Semana`, `VolumeSemanal` |
 | **P5 Ajustes** (`SettingsView`) | `Preferencias`, StoreKit, catálogo | `Preferencias`, e o store inteiro em "Apagar todos os dados" | `PreferencesRepository`, `PurchaseService.restaurar` |
@@ -447,6 +468,11 @@ Fora disso o botão Salvar fica desabilitado.
 **Grava** `favorito = true` e o título. **Copiar como texto** monta o treino em
 texto plano por `WorkoutTextExporter` (formato da seção 14) e confirma com
 "Treino copiado."
+
+Sob a metragem, em piscina **menor que 25 m**, mostra quantas travessias tem cada
+repetição: `4×54 m` vira `3 piscinas`, `2×252 m` vira `7 chegadas`. Chegada é ida
+e volta; quando as travessias não fecham em pares, conta-se em piscinas. Em raia
+de 25 ou 50 m a linha não aparece — a conta é óbvia e viraria ruído.
 
 **Nada é recalculado aqui.** Descanso, distância e voltas vêm gravados.
 
@@ -744,6 +770,30 @@ iPhone poria dado estimado no mesmo lugar onde hoje só entra dado medido, e é
 esse lugar que alimenta o Histórico, o volume da semana e a complication.
 
 Também é coerente com a compra: o que se vende é a execução guiada.
+
+### 6.16 Contagem de chegadas e piscinas — feature fora do spec
+
+**Não está no spec nem no roadmap.** Pedida pelo Alexandre em 15/09/2026, depois
+de nadar com o app publicado numa piscina de 18 m: `1×198 m` diz quanto nadar,
+mas não diz **quantas vezes bater na parede**, que é como o nadador conta dentro
+d'água.
+
+Implementada como `LapDisplay` (ver 3.6), só na tela P2, e **só em raia menor que
+25 m**.
+
+**O que foi considerado e recusado:** arredondar a distância para um número
+**par** de travessias, para a repetição sempre terminar na borda onde começou.
+Medido contra o catálogo real, arredondar sempre para par derruba o repertório de
+forma inaceitável — a raia de 18 m cairia de 205 exercícios para 133, a de 50 m
+de 203 para 119, e a de 25 m perderia os 23 blocos de 25 m e 75 m, porque um
+bloco de 25 m numa raia de 25 m é **uma** travessia e fechar em par exigiria
+100% de desvio.
+
+Uma variante mais branda — arredondar para par só quando o par couber na guarda
+de 25% — preservaria o repertório inteiro e converteria 44 dos 116 ímpares numa
+raia de 18 m. **Também foi recusada**, por uma razão melhor: mexer na regra 11.3
+muda a distância dos treinos de um app já publicado, e o ganho não paga o risco.
+A regra 11.3 continua exatamente como está.
 
 ### 6.12 O que não foi implementado, por decisão
 

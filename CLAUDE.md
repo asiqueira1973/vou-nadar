@@ -86,7 +86,7 @@ Instalar o XcodeGen: `brew install xcodegen`.
 # Gerar o projeto (sempre depois de mexer em arquivos)
 xcodegen generate
 
-# Testes — 206 testes, e o portão de qualidade do repositório
+# Testes — 214 testes, e o portão de qualidade do repositório
 xcodebuild -project VouNadar.xcodeproj -scheme VouNadar \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
   -configuration Debug CODE_SIGNING_ALLOWED=NO test

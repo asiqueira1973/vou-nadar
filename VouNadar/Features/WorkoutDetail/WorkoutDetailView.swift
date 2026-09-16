@@ -89,7 +89,7 @@ struct WorkoutDetailView: View {
                             .foregroundStyle(Color.textoSecundario)
                     } else {
                         ForEach(secao.series) { serie in
-                            LinhaDeSerie(serie: serie)
+                            LinhaDeSerie(serie: serie, tamanhoRaiaM: treino.tamanhoRaiaM)
                         }
                     }
                 } header: {
@@ -319,6 +319,10 @@ private struct LinhaDeSerie: View {
 
     let serie: WorkoutPresentation.SerieApresentada
 
+    /// A raia do treino, congelada na geração (spec 7.4). Decide se a contagem
+    /// de travessias aparece — ver `LapDisplay.raiaMaximaM`.
+    let tamanhoRaiaM: Int
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
@@ -354,6 +358,19 @@ private struct LinhaDeSerie: View {
                 Text(verbatim: "\(serie.repeticoes)\u{00D7}\(serie.distanciaM) m")
                     .font(.metragemSerie)
                     .foregroundStyle(Color.textoSecundario)
+
+                // Quantas vezes bater na parede, que é como se conta dentro
+                // d'água. Chegada é ida e volta; quando as travessias não fecham
+                // em pares, conta-se em piscinas — numa raia de 18 m, `54 m` são
+                // três travessias e não uma chegada e meia.
+                if let contagem = LapDisplay.contagem(
+                    voltasPorRepeticao: serie.voltasPorRepeticao,
+                    tamanhoRaiaM: tamanhoRaiaM)
+                {
+                    Text(Copy.travessias(contagem))
+                        .font(.contagemDeTravessias)
+                        .foregroundStyle(Color.textoSecundario)
+                }
 
                 // Série de uma repetição só não tem descanso interno: não há
                 // "entre as repetições" quando só existe uma (spec 7.2).

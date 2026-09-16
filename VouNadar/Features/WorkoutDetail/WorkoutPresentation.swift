@@ -71,6 +71,9 @@ struct WorkoutPresentation: Equatable, Hashable {
         let intensidade: Intensidade
         /// Descanso entre as repetições. Zero quando há só uma repetição.
         let descansoSeg: Int
+        /// Travessias de cada repetição, congeladas na geração (regra 11.3). É
+        /// o que `LapDisplay` traduz para chegadas ou piscinas.
+        let voltasPorRepeticao: Int
         /// SF Symbol do equipamento, resolvido do `icone_sf` do catálogo
         /// (spec 7.3). Nulo quando a série não exige equipamento.
         let simboloDoEquipamento: String?
@@ -104,6 +107,7 @@ extension WorkoutPresentation {
                         modo: serie.modo,
                         intensidade: serie.intensidade,
                         descansoSeg: serie.descansoSeg,
+                        voltasPorRepeticao: serie.voltasPorRepeticao,
                         simboloDoEquipamento: Self.simbolo(
                             deEquipamento: serie.equipamentoExigido, catalogo: catalogo))
                 })
@@ -138,6 +142,7 @@ extension WorkoutPresentation {
                         modo: serie.modo,
                         intensidade: serie.intensidade,
                         descansoSeg: serie.descansoSeg,
+                        voltasPorRepeticao: serie.voltasPorRepeticao,
                         simboloDoEquipamento: Self.simbolo(
                             deEquipamento: serie.equipamentoExigido, catalogo: catalogo))
                 })

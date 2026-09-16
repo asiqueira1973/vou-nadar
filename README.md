@@ -32,8 +32,8 @@ Em português. Sem conta, sem login, sem servidor.
 
 ## Estado
 
-v1.0.0. Doze épicos implementados e validados critério a critério, 206 testes em
-20 suítes, iOS e watchOS compilando em Release **sem nenhum warning**.
+v1.0.0 publicado na App Store. Doze épicos implementados e validados critério a
+critério, 214 testes em 21 suítes, iOS e watchOS compilando em Release **sem nenhum warning**.
 
 Falta o teste em piscina real — ver a checklist da seção 26 do
 `spec-vou-nadar.md`.
@@ -82,7 +82,7 @@ VouNadar/                    app do iPhone
   Features/                  as sete telas
 VouNadarWatch/               app do relógio — executa o treino e grava no Saúde
 VouNadarWatchComplication/   volume da semana no mostrador
-VouNadarTests/               206 testes
+VouNadarTests/               214 testes
 ```
 
 `Domain/`, `Data/Catalog/`, `Data/Enums/`, `Data/Models/`, `Data/Schema/` e

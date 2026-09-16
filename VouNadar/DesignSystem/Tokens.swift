@@ -160,6 +160,13 @@ extension Font {
     /// Descanso da série: `.footnote` com dígitos monoespaçados.
     static let descansoSerie = Font.footnote.monospacedDigit()
 
+    /// A contagem de chegadas ou piscinas, sob a metragem da série.
+    ///
+    /// Um degrau abaixo da metragem e do descanso: é informação de apoio, não o
+    /// número que o nadador procura. Estilo semântico, nunca ponto fixo
+    /// (DESIGN-SYSTEM.md seção 10).
+    static let contagemDeTravessias = Font.caption.monospacedDigit()
+
     /// Valor à direita de uma linha de lista: `.body` monoespaçado.
     static let valorDaLinha = Font.body.monospacedDigit()
 
